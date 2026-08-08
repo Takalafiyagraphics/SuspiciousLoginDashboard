@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Logs - CyberSec{% endblock %}
+{% block page_title %}Upload Log Files{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="cyber-card animate-fade-in">
+            <div class="card-header">
+                <h5><i class="bi bi-cloud-upload-fill me-2 text-primary"></i>Upload Authentication Logs</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="upload-area mb-4" id="uploadArea">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                        <h5 class="mt-3">Drag & Drop or Click to Upload</h5>
+                        <p style="color: var(--text-muted);">Supported formats: <strong>.txt</strong>, <strong>.log</strong>, <strong>.csv</strong></p>
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Maximum file size: 16MB</p>
+                        <input type="file" name="logfile" id="logfile" accept=".txt,.log,.csv" 
+                               style="display: none;" required>
+                        <button type="button" class="btn btn-outline-cyber mt-2" onclick="document.getElementById('logfile').click()">
+                            <i class="bi bi-folder-open me-2"></i>Browse Files
+                        </button>
+                    </div>
+
+                    <div id="fileInfo" class="mb-4" style="display: none;">
+                        <div class="d-flex align-items-center gap-3 p-3" style="background: var(--bg-sidebar); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <i class="bi bi-file-earmark-text" style="font-size: 2rem; color: var(--primary-color);"></i>
+                            <div>
+                                <p class="mb-0" id="fileName" style="font-weight: 600; color: #fff;"></p>
+                                <small id="fileSize" style="color: var(--text-muted);"></small>
+                            </div>
+                            <button type="button" class="btn btn-sm ms-auto" style="color: #ef4444;" onclick="clearFile()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-cyber" id="uploadBtn" disabled>
+                            <i class="bi bi-upload me-2"></i>Upload & Analyze
+                        </button>
+                    </div>
+                </form>
+
+                <hr style="border-color: var(--border-color); margin: 2rem 0;">
+
+                <h6 class="mb-3"><i class="bi bi-info-circle me-2 text-info"></i>Expected Log Format</h6>
+                <div style="background: var(--bg-sidebar); border-radius: 12px; padding: 1rem; border: 1px solid var(--border-color);">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Standard auth.log format:</p>
+                    <code style="color: var(--primary-color); font-size: 0.8rem; display: block; margin-bottom: 1rem;">
+                        Jul 28 09:00:12 server sshd[1234]: Failed password for admin from 192.168.1.20
+                    </code>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Simple format:</p>
+                    <code style="color: var(--primary-color); font-size: 0.8rem; display: block; margin-bottom: 1rem;">
+                        2026-07-28 09:00:12 admin 192.168.1.20 failed
+                    </code>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">CSV format:</p>
+                    <code style="color: var(--primary-color); font-size: 0.8rem; display: block;">
+                        2026-07-28, 09:00:12, admin, 192.168.1.20, failed
+                    </code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('logfile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary-color)';
+        uploadArea.style.background = 'rgba(13, 202, 240, 0.05)';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = 'var(--border-color)';
+        uploadArea.style.background = 'var(--bg-card)';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--border-color)';
+        uploadArea.style.background = 'var(--bg-card)';
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            showFileInfo(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            showFileInfo(fileInput.files[0]);
+        }
+    });
+
+    function showFileInfo(file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+        fileInfo.style.display = 'block';
+        uploadBtn.disabled = false;
+    }
+
+    function clearFile() {
+        fileInput.value = '';
+        fileInfo.style.display = 'none';
+        uploadBtn.disabled = true;
+    }
+</script>
+{% endblock %}

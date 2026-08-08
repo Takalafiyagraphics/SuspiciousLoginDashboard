@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - CyberSec{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="cyber-card animate-fade-in">
+            <div class="card-header">
+                <h5><i class="bi bi-shield-fill me-2 text-primary"></i>Security Configuration</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">Session Timeout (minutes)</label>
+                    <input type="number" class="form-control form-control-cyber" value="120" min="5" max="1440">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">Max Failed Login Threshold</label>
+                    <input type="number" class="form-control form-control-cyber" value="5" min="1" max="50">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">Alert Retention (days)</label>
+                    <input type="number" class="form-control form-control-cyber" value="90" min="1" max="365">
+                </div>
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                        <label class="form-check-label" style="color: #e2e8f0;">Enable CSRF Protection</label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                        <label class="form-check-label" style="color: #e2e8f0;">Enable XSS Protection</label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                        <label class="form-check-label" style="color: #e2e8f0;">Enable SQL Injection Protection</label>
+                    </div>
+                </div>
+                <button class="btn btn-cyber w-100"><i class="bi bi-save me-2"></i>Save Security Settings</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="cyber-card animate-fade-in delay-2">
+            <div class="card-header">
+                <h5><i class="bi bi-bell-fill me-2 text-warning"></i>Alert Configuration</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">Critical Alert Threshold</label>
+                    <input type="number" class="form-control form-control-cyber" value="10" min="1" max="100">
+                    <small style="color: var(--text-muted);">Number of failed attempts to trigger Critical alert</small>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">High Alert Threshold</label>
+                    <input type="number" class="form-control form-control-cyber" value="5" min="1" max="50">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label" style="color: var(--text-muted);">Rapid Attack Window (minutes)</label>
+                    <input type="number" class="form-control form-control-cyber" value="5" min="1" max="60">
+                    <small style="color: var(--text-muted);">Time window for detecting rapid-fire attacks</small>
+                </div>
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                        <label class="form-check-label" style="color: #e2e8f0;">Detect Off-Hours Logins (12AM - 5AM)</label>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked style="background-color: var(--primary-color); border-color: var(--primary-color);">
+                        <label class="form-check-label" style="color: #e2e8f0;">Monitor Root Account Access</label>
+                    </div>
+                </div>
+                <button class="btn btn-cyber w-100"><i class="bi bi-save me-2"></i>Save Alert Settings</button>
+            </div>
+        </div>
+        <div class="cyber-card animate-fade-in delay-3 mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-database-fill me-2 text-info"></i>Database Management</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-cyber"><i class="bi bi-trash me-2"></i>Clear All Logs</button>
+                    <button class="btn btn-outline-cyber"><i class="bi bi-trash me-2"></i>Clear All Alerts</button>
+                    <button class="btn btn-outline-cyber" style="border-color: #ef4444; color: #ef4444;"><i class="bi bi-exclamation-triangle me-2"></i>Reset Database</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

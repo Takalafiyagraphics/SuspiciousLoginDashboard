@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}View Logs - CyberSec{% endblock %}
+{% block page_title %}Login Log Viewer{% endblock %}
+
+{% block content %}
+<div class="cyber-card animate-fade-in">
+    <div class="card-header">
+        <h5><i class="bi bi-file-text-fill me-2 text-primary"></i>Authentication Logs</h5>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('export_logs_csv') }}" class="btn btn-sm btn-outline-cyber">
+                <i class="bi bi-download me-1"></i>Export CSV
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Filters -->
+        <form method="GET" action="{{ url_for('logs') }}" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text" style="background: var(--bg-sidebar); border-color: var(--border-color); color: var(--text-muted);">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control form-control-cyber" 
+                           placeholder="Search username, IP, message..." value="{{ search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select form-control-cyber">
+                    <option value="">All Status</option>
+                    <option value="success" {% if status_filter == 'success' %}selected{% endif %}>Success</option>
+                    <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="risk" class="form-select form-control-cyber">
+                    <option value="">All Risk Levels</option>
+                    <option value="Low" {% if risk_filter == 'Low' %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if risk_filter == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if risk_filter == 'High' %}selected{% endif %}>High</option>
+                    <option value="Critical" {% if risk_filter == 'Critical' %}selected{% endif %}>Critical</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-cyber w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="cyber-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>IP Address</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Risk Level</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs.items %}
+                        {% for log in logs.items %}
+                        <tr>
+                            <td><code style="color: var(--primary-color);">#{{ log.id }}</code></td>
+                            <td><strong>{{ log.username }}</strong></td>
+                            <td><span style="font-family: monospace;">{{ log.ip_address }}</span></td>
+                            <td>{{ log.login_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ log.login_time.strftime('%H:%M:%S') }}</td>
+                            <td>
+                                <span class="badge badge-{{ log.status }}">
+                                    <i class="bi bi-{% if log.status == 'success' %}check{% else %}x{% endif %}-circle me-1"></i>
+                                    {{ log.status.title() }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ log.risk_level|lower }}">{{ log.risk_level }}</span>
+                            </td>
+                            <td>
+                                <small style="color: var(--text-muted);">{{ log.message[:60] if log.message else '-' }}{% if log.message and log.message|length > 60 %}...{% endif %}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5" style="color: var(--text-muted);">
+                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                <p class="mt-2">No logs found. Upload a log file to get started.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if logs.pages > 1 %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if logs.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('logs', page=logs.prev_num, search=search, status=status_filter, risk=risk_filter) }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for page_num in logs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == logs.page %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('logs', page=page_num, search=search, status=status_filter, risk=risk_filter) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if logs.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('logs', page=logs.next_num, search=search, status=status_filter, risk=risk_filter) }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        <div class="text-center mt-3" style="color: var(--text-muted); font-size: 0.85rem;">
+            Showing {{ logs.items|length }} of {{ logs.total }} entries
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Alerts - CyberSec{% endblock %}
+{% block page_title %}Security Alerts{% endblock %}
+
+{% block content %}
+<div class="cyber-card animate-fade-in">
+    <div class="card-header">
+        <h5><i class="bi bi-exclamation-triangle-fill me-2 text-warning"></i>Security Alerts</h5>
+        <div class="d-flex gap-2">
+            <span class="badge badge-critical px-3 py-2">Critical</span>
+            <span class="badge badge-high px-3 py-2">High</span>
+            <span class="badge badge-medium px-3 py-2">Medium</span>
+            <span class="badge badge-low px-3 py-2">Low</span>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Filters -->
+        <form method="GET" action="{{ url_for('alerts') }}" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <select name="severity" class="form-select form-control-cyber">
+                    <option value="">All Severities</option>
+                    <option value="Critical" {% if severity_filter == 'Critical' %}selected{% endif %}>Critical</option>
+                    <option value="High" {% if severity_filter == 'High' %}selected{% endif %}>High</option>
+                    <option value="Medium" {% if severity_filter == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="Low" {% if severity_filter == 'Low' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-cyber w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+
+        <!-- Alerts Table -->
+        <div class="table-responsive">
+            <table class="cyber-table">
+                <thead>
+                    <tr>
+                        <th>Alert ID</th>
+                        <th>Severity</th>
+                        <th>Username</th>
+                        <th>IP Address</th>
+                        <th>Reason</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if alerts.items %}
+                        {% for alert in alerts.items %}
+                        <tr class="severity-{{ alert.severity|lower }}">
+                            <td><code style="color: var(--primary-color);">#{{ alert.id }}</code></td>
+                            <td>
+                                <span class="badge badge-{{ alert.severity|lower }} px-3 py-2">
+                                    <i class="bi bi-{% if alert.severity == 'Critical' %}x-octagon{% elif alert.severity == 'High' %}exclamation-triangle{% elif alert.severity == 'Medium' %}exclamation-circle{% else %}info-circle{% endif %} me-1"></i>
+                                    {{ alert.severity }}
+                                </span>
+                            </td>
+                            <td><strong>{{ alert.username }}</strong></td>
+                            <td><span style="font-family: monospace;">{{ alert.ip_address }}</span></td>
+                            <td style="max-width: 400px;">
+                                <small style="color: #e2e8f0;">{{ alert.reason }}</small>
+                            </td>
+                            <td>
+                                <small style="color: var(--text-muted);">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ alert.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5" style="color: var(--text-muted);">
+                                <i class="bi bi-shield-check" style="font-size: 2rem;"></i>
+                                <p class="mt-2">No alerts found. Upload logs to detect threats.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if alerts.pages > 1 %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if alerts.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('alerts', page=alerts.prev_num, severity=severity_filter) }}">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% for page_num in alerts.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        {% if page_num == alerts.page %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('alerts', page=page_num, severity=severity_filter) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if alerts.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('alerts', page=alerts.next_num, severity=severity_filter) }}">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        <div class="text-center mt-3" style="color: var(--text-muted); font-size: 0.85rem;">
+            Showing {{ alerts.items|length }} of {{ alerts.total }} alerts
+        </div>
+    </div>
+</div>
+
+<style>
+    .severity-critical { background: rgba(239, 68, 68, 0.05) !important; }
+    .severity-high { background: rgba(245, 158, 11, 0.05) !important; }
+    .severity-medium { background: rgba(251, 191, 36, 0.05) !important; }
+    .severity-low { background: rgba(16, 185, 129, 0.05) !important; }
+</style>
+{% endblock %}

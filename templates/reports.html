@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - CyberSec{% endblock %}
+{% block page_title %}Report Generator{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="cyber-card animate-fade-in">
+            <div class="card-header">
+                <h5><i class="bi bi-file-earmark-plus-fill me-2 text-primary"></i>Generate New Report</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('reports') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-muted); font-size: 0.875rem;">Report Name</label>
+                        <input type="text" name="report_name" class="form-control form-control-cyber" placeholder="e.g., Weekly Security Analysis" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" style="color: var(--text-muted); font-size: 0.875rem;">Report Format</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="radio" name="report_type" id="pdf" value="pdf" class="btn-check" checked>
+                                <label for="pdf" class="btn btn-outline-cyber w-100 py-3">
+                                    <i class="bi bi-file-earmark-pdf" style="font-size: 1.5rem;"></i><br><small>PDF Report</small>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" name="report_type" id="csv" value="csv" class="btn-check">
+                                <label for="csv" class="btn btn-outline-cyber w-100 py-3">
+                                    <i class="bi bi-file-earmark-spreadsheet" style="font-size: 1.5rem;"></i><br><small>CSV Export</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="color: var(--text-muted); font-size: 0.875rem;">Report Contents</label>
+                        <div class="p-3" style="background: var(--bg-sidebar); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Executive Summary</span></div>
+                            <div class="d-flex align-items-center mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Statistical Analysis</span></div>
+                            <div class="d-flex align-items-center mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Top Attacking IPs</span></div>
+                            <div class="d-flex align-items-center mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Suspicious Users</span></div>
+                            <div class="d-flex align-items-center mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Security Alerts</span></div>
+                            <div class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-success me-2"></i><span>Recommendations</span></div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-cyber w-100">
+                        <i class="bi bi-magic me-2"></i>Generate Report
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="cyber-card animate-fade-in delay-2">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history me-2 text-info"></i>Generated Reports</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if reports %}
+                <div class="table-responsive">
+                    <table class="cyber-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Report Name</th>
+                                <th>Generated On</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td><code style="color: var(--primary-color);">#{{ report.id }}</code></td>
+                                <td><strong>{{ report.report_name }}</strong></td>
+                                <td><small style="color: var(--text-muted);"><i class="bi bi-calendar me-1"></i>{{ report.generated_on.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                                <td>
+                                    <a href="{{ url_for('download_report', filename=report.report_name ~ '.pdf') }}" class="btn btn-sm btn-outline-cyber">
+                                        <i class="bi bi-download me-1"></i>PDF
+                                    </a>
+                                    <a href="{{ url_for('download_report', filename=report.report_name ~ '.csv') }}" class="btn btn-sm btn-outline-cyber ms-1">
+                                        <i class="bi bi-download me-1"></i>CSV
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5" style="color: var(--text-muted);">
+                    <i class="bi bi-folder" style="font-size: 2rem;"></i>
+                    <p class="mt-2">No reports generated yet. Create your first report.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
