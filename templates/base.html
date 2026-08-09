@@ -726,7 +726,13 @@
             <div class="nav-actions">
                 <div class="dropdown user-dropdown">
                     <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
-                        <div class="user-avatar">{{ current_user.username[0].upper() }}</div>
+                        <div class="user-avatar">
+    {% if current_user.is_authenticated %}
+        {{ current_user.username[0].upper() }}
+    {% else %}
+        ?
+    {% endif %}
+</div>
                         <span class="d-none d-md-inline">{{ current_user.username }}</span>
                         <i class="bi bi-chevron-down"></i>
                     </a>
