@@ -371,11 +371,11 @@ with app.app_context():
     from werkzeug.security import generate_password_hash
     admin = User.query.filter_by(username='admin').first()
     if not admin:
-            admin = User(
-        username='admin',
-        password=generate_password_hash('Admin@123'),
-        role='admin'
-    )
+        admin = User(
+            username='admin',
+            password=generate_password_hash('Admin@123'),
+            role='admin'
+        )
         db.session.add(admin)
         db.session.commit()
 
