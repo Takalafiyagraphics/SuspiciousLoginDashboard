@@ -365,15 +365,19 @@ def internal_error(error):
 # MAIN
 # ============================================================
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        # Create default admin if not exists
-        if not User.query.filter_by(username='admin').first():
-            admin = User(username='admin', role='admin')
-            admin.set_password('Admin@123')
-            db.session.add(admin)
-            db.session.commit()
-            print('Default admin created: admin / Admin@123')
+# Create database tables on startup
+with app.app_context():
+    db.create_all()
+    from werkzeug.security import generate_password_hash
+    admin = User.query.filter_by(username='admin').first()
+    if not admin:
+        admin = User(
+            username='admin',
+            password_hash=generate_password_hash('Admin@123'),
+            role='admin'
+        )
+        db.session.add(admin)
+        db.session.commit()
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == '__main__':
+    app.run(debug=True)
